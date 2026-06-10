@@ -6,3 +6,5 @@ pydantic
 sentence-transformers
 numpy
 pymysql
+qdrant-client
+sentence-transformers
