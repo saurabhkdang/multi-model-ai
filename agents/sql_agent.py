@@ -1,59 +1,13 @@
 import json
 import re
 from llm_client import call_llm
-from db import run_sql, get_db_connection
-
+from db import run_sql, get_db_connection, get_view_columns
 
 TABLE_INFO = {
     "employees": "this is the table having all employees",
     "employee_attendance_leaves_status" : "table to have all employee attendance status of all days",
     "employees_job_details" : "table to have all data related to employee job details"
 }
-
-VIEW_SCHEMAS = {
-    "employees": """
-View: employees
-Columns:
-- id
-- name
-- email
-- dob
-- status
-- report_to
-""",
-
-    "employee_attendance_leaves_status": """
-View: employee_attendance_leaves_status
-Columns:
-- user_id
-- name
-- attendance_date
-- attendance_status
-- month_year
-- opening_cl
-- availed_cl
-- closing_cl
-- opening_sl
-- availed_sl
-- closing_sl
-- opening_pl
-- availed_pl
-- closing_pl
-""",
-
-    "employees_job_details": """
-View: employees_job_details
-Columns:
-- user_id
-- name
-- email
-- designation
-- department
-- job_type
-- job_description
-"""
-}
-
 
 ALLOWED_VIEWS = list(TABLE_INFO.keys())
 
@@ -149,8 +103,31 @@ User Question:
 
     return valid_views
 
-
 def get_selected_schema(views):
+    schema_data = get_view_columns(views)
+
+    schema_parts = []
+
+    for view_name, columns in schema_data.items():
+        column_lines = []
+
+        for col in columns:
+            column_lines.append(
+                f"- {col['column']} ({col['type']})"
+            )
+
+        schema_parts.append(
+            f"""
+View: {view_name}
+
+Columns:
+{chr(10).join(column_lines)}
+"""
+        )
+
+    return "\n\n".join(schema_parts)
+
+def get_selected_schema1(views):
     connection = get_db_connection()
 
     cursor = connection.cursor()
@@ -214,9 +191,8 @@ User Question:
 def sql_agent(task_input: str):
     try:
         views = detect_views(task_input)
-        print("Views : ", views)
         schema = get_selected_schema(views)
-        print("Schema : ", schema)
+        
         sql = generate_sql(
             question=task_input,
             schema=schema

@@ -51,9 +51,14 @@ def vector_agent(task_input: str):
                 "chunks": []
             }
 
+        retrieved_context = "\n\n".join(
+            chunk["text"] for chunk in chunks
+        )
+
         return {
             "query": task_input,
-            "chunks": chunks
+            "chunks": chunks,
+            "retrieved_context": retrieved_context
         }
 
     except Exception as e:
