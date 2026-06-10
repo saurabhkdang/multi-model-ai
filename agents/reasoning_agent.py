@@ -23,10 +23,9 @@ Your job:
 4. Either return final answer or request one more agent call
 
 Available agents:
-- MATH_AGENT
 - MEMORY_AGENT
 - VECTOR_AGENT
-- SUMMARY_AGENT
+- SQL_AGENT
 - GENERAL_AGENT
 
 Rules:

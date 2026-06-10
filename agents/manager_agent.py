@@ -3,10 +3,7 @@ import re
 
 from llm_client import call_llm
 
-from agents.math_agent import math_agent
 from agents.memory_agent import memory_agent
-# from agents.policy_agent import policy_agent
-from agents.summary_agent import summary_agent
 from agents.general_agent import general_agent
 from agents.reasoning_agent import reasoning_agent
 from agents.sql_agent import sql_agent
@@ -31,24 +28,18 @@ You assign tasks to specialist agents.
 
 Available agents:
 
-1. MATH_AGENT
-Use for calculations.
-
-2. MEMORY_AGENT
+1. MEMORY_AGENT
 Use to save or recall user memory.
 For save, input must be key=value.
 For recall, input must be key.
 
-3. SUMMARY_AGENT
-Use for summarization.
-
-4. GENERAL_AGENT
+2. GENERAL_AGENT
 Use only if no specialist agent fits.
 
-5. SQL_AGENT
+3. SQL_AGENT
 Use for employee database questions like leave balance, employee details, attendance, status, DOB, reporting manager.
 
-6. VECTOR_AGENT
+4. VECTOR_AGENT
 Use for work from home policy, buddy program and referral program document search.
 
 Return ONLY JSON.
@@ -58,7 +49,7 @@ Format:
 {{
  "tasks":[
    {{
-     "agent":"MATH_AGENT | MEMORY_AGENT | SUMMARY_AGENT | GENERAL_AGENT | SQL_AGENT | VECTOR_AGENT",
+     "agent":"MEMORY_AGENT | GENERAL_AGENT | SQL_AGENT | VECTOR_AGENT",
      "input":"input for specialist agent"
    }}
  ]
@@ -68,27 +59,14 @@ User Query:
 
 {user_query}
 """
-    
-    # POLICY_AGENT
-    # 3. POLICY_AGENT
-    # Use for HR policy questions.
 
     response = call_llm(prompt)
     return extract_json(response)
 
 
 def run_specialist_agent(agent_name: str, task_input: str):
-    if agent_name == "MATH_AGENT":
-        return math_agent(task_input)
-
     if agent_name == "MEMORY_AGENT":
         return memory_agent(task_input)
-
-    # if agent_name == "POLICY_AGENT":
-    #     return policy_agent(task_input)
-
-    if agent_name == "SUMMARY_AGENT":
-        return summary_agent(task_input)
 
     if agent_name == "GENERAL_AGENT":
         return general_agent(task_input)
