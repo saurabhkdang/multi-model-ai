@@ -1,4 +1,6 @@
 import os
+import time
+from core.logger import log_event
 from dotenv import load_dotenv
 from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
@@ -19,7 +21,15 @@ embedding_model = SentenceTransformer(EMBEDDING_MODEL)
 MIN_SCORE = 0.50
 LIMIT = 5
 
-def vector_agent(task_input: str):
+def vector_agent(task_input: str, request_id: str):
+    start_time = time.time()
+
+    log_event("AGENT_STARTED", {
+        "request_id": request_id,
+        "agent": "VECTOR_AGENT",
+        "input": task_input
+    })
+
     try:
         query_vector = embedding_model.encode(
             task_input,
@@ -32,6 +42,18 @@ def vector_agent(task_input: str):
             limit=LIMIT,
             score_threshold=MIN_SCORE
         )
+
+        duration_ms = round((time.time() - start_time) * 1000, 2)
+        top_score = search_result.points[0].score if search_result else None
+
+        log_event("VECTOR_SEARCH_COMPLETED", {
+            "request_id": request_id,
+            "limit": LIMIT,
+            "score_threshold": MIN_SCORE,
+            "matched_chunks": len(search_result.points),
+            "top_score": top_score,
+            "duration_ms": duration_ms
+        })
 
         chunks = []
 
@@ -55,6 +77,13 @@ def vector_agent(task_input: str):
             chunk["text"] for chunk in chunks
         )
 
+        log_event("AGENT_COMPLETED", {
+            "request_id": request_id,
+            "agent": "VECTOR_AGENT",
+            "success": True,
+            "duration_ms": duration_ms
+        })
+
         return {
             "query": task_input,
             "chunks": chunks,
@@ -62,6 +91,15 @@ def vector_agent(task_input: str):
         }
 
     except Exception as e:
+        duration_ms = round((time.time() - start_time) * 1000, 2)
+
+        log_event("AGENT_FAILED", {
+            "request_id": request_id,
+            "agent": "VECTOR_AGENT",
+            "error": str(e),
+            "duration_ms": duration_ms
+        })
+
         return {
             "error": str(e)
         }

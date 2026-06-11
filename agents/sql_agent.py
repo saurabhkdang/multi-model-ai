@@ -2,6 +2,8 @@ import json
 import re
 from llm_client import call_llm
 from db import run_sql, get_db_connection, get_view_columns
+import time
+from core.logger import log_event
 
 TABLE_INFO = {
     "employees": "this is the table having all employees",
@@ -150,7 +152,7 @@ def get_selected_schema1(views):
     return schema_info
 
 
-def generate_sql(question: str, schema: str):
+def generate_sql(question: str, schema: str, request_id: str):
     prompt = f"""
 You are a MySQL SQL generator.
 
@@ -182,23 +184,68 @@ User Question:
     response = call_llm(prompt)
     sql = extract_sql(response)
 
-    if not is_safe_sql(sql):
+    is_valid = is_safe_sql(sql)
+    log_event("SQL_VALIDATION", {
+        "request_id": request_id,
+        "is_valid": is_valid,
+        "reason": "Unsafe SQL generated"
+    })
+
+    if not is_valid:
         raise ValueError("Unsafe SQL generated")
 
     return sql
 
 
-def sql_agent(task_input: str):
+def sql_agent(task_input: str, request_id: str):
+    start_time = time.time()
+
+    log_event("AGENT_STARTED", {
+        "request_id": request_id,
+        "agent": "SQL_AGENT",
+        "input": task_input
+    })
+
     try:
         views = detect_views(task_input)
+        log_event("SQL_VIEW_SELECTION", {
+            "request_id": request_id,
+            "selected_views": views
+        })
+
         schema = get_selected_schema(views)
-        
+        log_event("SQL_SCHEMA_FETCHED", {
+            "request_id": request_id,
+            "selected_views": views,
+            "columns": schema
+        })
+
         sql = generate_sql(
             question=task_input,
-            schema=schema
+            schema=schema,
+            request_id=request_id
         )
+        log_event("SQL_GENERATED", {
+            "request_id": request_id,
+            "sql": sql
+        })
 
         result = run_sql(sql)
+
+        duration_ms = round((time.time() - start_time) * 1000, 2)
+
+        log_event("SQL_EXECUTED", {
+            "request_id": request_id,
+            "row_count": len(result) if isinstance(result, list) else None,
+            "duration_ms": duration_ms
+        })
+
+        log_event("AGENT_COMPLETED", {
+            "request_id": request_id,
+            "agent": "SQL_AGENT",
+            "success": True,
+            "duration_ms": duration_ms
+        })
 
         return {
             "views": views,
@@ -207,6 +254,15 @@ def sql_agent(task_input: str):
         }
 
     except Exception as e:
+        duration_ms = round((time.time() - start_time) * 1000, 2)
+
+        log_event("AGENT_FAILED", {
+            "request_id": request_id,
+            "agent": "SQL_AGENT",
+            "error": str(e),
+            "duration_ms": duration_ms
+        })
+        
         return {
             "error": str(e)
         }

@@ -1,12 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from agents.manager_agent import run_manager_agent
+from middleware.logging_middleware import logging_middleware
 
 app = FastAPI(title="Minimal AI Agent")
-
+app.middleware("http")(logging_middleware)
 
 class AskRequest(BaseModel):
     query: str
+    debug: bool = False
 
 
 @app.get("/")
@@ -17,5 +19,13 @@ def home():
 
 
 @app.post("/ask")
-def ask(request: AskRequest):
-    return run_manager_agent(request.query)
+async def ask(payload: AskRequest, request: Request):
+    request_id = request.state.request_id
+    result = run_manager_agent(
+        user_query=payload.query,
+        request_id=request_id,
+        debug=payload.debug
+    )
+
+    return result
+    # return run_manager_agent(request.query)

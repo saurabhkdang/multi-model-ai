@@ -1,5 +1,7 @@
 import json
 import re
+import time
+from core.logger import log_event
 from llm_client import call_llm
 
 
@@ -12,7 +14,22 @@ def extract_json(text: str):
     return json.loads(match.group())
 
 
-def reasoning_agent(user_query, manager_plan, specialist_results):
+def reasoning_agent(user_query, manager_plan, specialist_results, request_id: str):
+    start_time = time.time()
+
+    log_event("REASONING_STARTED", {
+        "request_id": request_id,
+        "user_query": user_query,
+        "tasks_completed": [
+            {
+                "agent": item["agent"],
+                "input": item["input"]
+            }
+            for item in specialist_results
+        ]
+        # "available_results": list(specialist_results.keys())
+    })
+
     prompt = f"""
 You are a reasoning agent.
 
@@ -63,4 +80,20 @@ Specialist Results:
 """
 
     response = call_llm(prompt)
+
+    duration_ms = round((time.time() - start_time) * 1000, 2)
+
+    log_event("REASONING_COMPLETED", {
+        "request_id": request_id,
+        # "used_results": list(specialist_results.keys()),
+        "tasks_completed": [
+            {
+                "agent": item["agent"],
+                "input": item["input"]
+            }
+            for item in specialist_results
+        ],
+        "duration_ms": duration_ms
+    })
+    
     return extract_json(response)
