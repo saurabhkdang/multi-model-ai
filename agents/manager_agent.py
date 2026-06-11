@@ -176,7 +176,7 @@ def run_manager_agent(user_query: str, request_id: str, debug: bool = False):
         response["debug"] = {
             "request_id": request_id,
             "manager_plan": plan,
-            "agents_called": plan["selected_agents"],
+            "agents_called": selected_agents,
             "agent_results": results,
             "duration_ms": total_time_ms
         }
