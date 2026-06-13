@@ -44,7 +44,9 @@ def vector_agent(task_input: str, request_id: str):
         )
 
         duration_ms = round((time.time() - start_time) * 1000, 2)
-        top_score = search_result.points[0].score if search_result else None
+        points = search_result.points if search_result and search_result.points else []
+        top_score = points[0].score if points else None
+        # top_score = search_result.points[0].score if search_result else None
 
         log_event("VECTOR_SEARCH_COMPLETED", {
             "request_id": request_id,
@@ -85,6 +87,7 @@ def vector_agent(task_input: str, request_id: str):
         })
 
         return {
+            "success": True,
             "query": task_input,
             "chunks": chunks,
             "retrieved_context": retrieved_context
@@ -101,5 +104,9 @@ def vector_agent(task_input: str, request_id: str):
         })
 
         return {
-            "error": str(e)
+            "success": False,
+            "query": task_input,
+            "error": str(e),
+            "chunks": [],
+            "retrieved_context": ""
         }

@@ -133,9 +133,33 @@ def run_manager_agent(user_query: str, request_id: str, debug: bool = False):
       request_id=request_id
     )
 
-    if reasoning_result.get("status") == "NEED_MORE_INFO":
+    MAX_REASONING_ITERATIONS = 2
+    iteration = 0
+
+    #if reasoning_result.get("status") == "NEED_MORE_INFO":
+    while reasoning_result.get("status") == "NEED_MORE_INFO" and iteration < MAX_REASONING_ITERATIONS:
         required_agent = reasoning_result.get("required_agent")
         extra_input = reasoning_result.get("input")
+
+        already_called = any(
+            r["agent"] == required_agent and r["input"] == extra_input
+            for r in results
+        )
+
+        if already_called:
+            log_event("REASONING_DUPLICATE_REQUEST_BLOCKED", {
+                "request_id": request_id,
+                "agent": required_agent,
+                "input": extra_input
+            })
+            break
+
+        log_event("REASONING_REQUESTED_AGENT", {
+            "request_id": request_id,
+            "agent": required_agent,
+            "input": extra_input,
+            "iteration": iteration + 1
+        })
 
         extra_output = run_specialist_agent(
             required_agent,
@@ -157,6 +181,13 @@ def run_manager_agent(user_query: str, request_id: str, debug: bool = False):
             specialist_results=results,
             request_id=request_id
         )
+
+        iteration += 1
+
+    if iteration == MAX_REASONING_ITERATIONS:
+        log_event("REASONING_MAX_ITERATIONS_REACHED", {
+            "request_id": request_id
+        })
 
     total_time_ms = round((time.time() - start_time) * 1000, 2)
 

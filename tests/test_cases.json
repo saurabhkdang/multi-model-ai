@@ -1,0 +1,156 @@
+[
+  {
+    "id": 1,
+    "question": "What is the leave balance of Saurabh Dang?",
+    "expected_agents": ["SQL_AGENT"],
+    "expected_type": "sql"
+  },
+  {
+    "id": 2,
+    "question": "Show attendance of Saurabh Dang for last 7 days",
+    "expected_agents": ["SQL_AGENT"],
+    "expected_type": "sql"
+  },
+  {
+    "id": 3,
+    "question": "What is the DOB of Saurabh Dang?",
+    "expected_agents": ["SQL_AGENT"],
+    "expected_type": "sql"
+  },
+  {
+    "id": 4,
+    "question": "List all active employees",
+    "expected_agents": ["SQL_AGENT"],
+    "expected_type": "sql"
+  },
+  {
+    "id": 5,
+    "question": "Who is Saurabh Dang reporting to?",
+    "expected_agents": ["SQL_AGENT"],
+    "expected_type": "sql"
+  },
+
+  {
+    "id": 6,
+    "question": "What is the leave policy?",
+    "expected_agents": ["VECTOR_AGENT"],
+    "expected_type": "vector"
+  },
+  {
+    "id": 7,
+    "question": "Explain sick leave rules",
+    "expected_agents": ["VECTOR_AGENT"],
+    "expected_type": "vector"
+  },
+  {
+    "id": 8,
+    "question": "How can an employee apply for leave?",
+    "expected_agents": ["VECTOR_AGENT"],
+    "expected_type": "vector"
+  },
+  {
+    "id": 9,
+    "question": "What happens if an employee is repeatedly late?",
+    "expected_agents": ["VECTOR_AGENT"],
+    "expected_type": "vector"
+  },
+  {
+    "id": 10,
+    "question": "Explain work from home policy",
+    "expected_agents": ["VECTOR_AGENT"],
+    "expected_type": "vector"
+  },
+
+  {
+    "id": 11,
+    "question": "Show leave balance of Saurabh Dang and also explain leave policy",
+    "expected_agents": ["SQL_AGENT", "VECTOR_AGENT"],
+    "expected_type": "hybrid"
+  },
+  {
+    "id": 12,
+    "question": "Show attendance of Amit today and what happens for repeated late attendance",
+    "expected_agents": ["SQL_AGENT", "VECTOR_AGENT"],
+    "expected_type": "hybrid"
+  },
+  {
+    "id": 13,
+    "question": "Tell me Saurabh Dang's DOB and explain birthday leave policy",
+    "expected_agents": ["SQL_AGENT", "VECTOR_AGENT"],
+    "expected_type": "hybrid"
+  },
+  {
+    "id": 14,
+    "question": "Compare leave balance of Saurabh Dang and Shanky",
+    "expected_agents": ["SQL_AGENT"],
+    "expected_type": "sql"
+  },
+  {
+    "id": 15,
+    "question": "List employees on leave today and explain leave approval process",
+    "expected_agents": ["SQL_AGENT", "VECTOR_AGENT"],
+    "expected_type": "hybrid"
+  },
+
+  {
+    "id": 16,
+    "question": "Remember that I am checking Saurabh Dang's HR data",
+    "expected_agents": ["MEMORY_AGENT"],
+    "expected_type": "memory"
+  },
+  {
+    "id": 17,
+    "question": "What is his leave balance?",
+    "expected_agents": ["MEMORY_AGENT", "SQL_AGENT"],
+    "expected_type": "follow_up"
+  },
+  {
+    "id": 18,
+    "question": "What about his attendance last week?",
+    "expected_agents": ["MEMORY_AGENT", "SQL_AGENT"],
+    "expected_type": "follow_up"
+  },
+  {
+    "id": 19,
+    "question": "Explain the policy related to it",
+    "expected_agents": ["MEMORY_AGENT", "VECTOR_AGENT"],
+    "expected_type": "follow_up"
+  },
+  {
+    "id": 20,
+    "question": "Now compare with Shanky",
+    "expected_agents": ["MEMORY_AGENT", "SQL_AGENT"],
+    "expected_type": "follow_up"
+  },
+
+  {
+    "id": 21,
+    "question": "What is the salary of unknown employee xyzabc?",
+    "expected_agents": ["SQL_AGENT"],
+    "expected_type": "no_data"
+  },
+  {
+    "id": 22,
+    "question": "Explain moon leave policy",
+    "expected_agents": ["VECTOR_AGENT"],
+    "expected_type": "no_data"
+  },
+  {
+    "id": 23,
+    "question": "Delete employee Saurabh Dang",
+    "expected_agents": ["SQL_AGENT"],
+    "expected_type": "blocked"
+  },
+  {
+    "id": 24,
+    "question": "Update Saurabh Dang leave balance to 100",
+    "expected_agents": ["SQL_AGENT"],
+    "expected_type": "blocked"
+  },
+  {
+    "id": 25,
+    "question": "Hello, how are you?",
+    "expected_agents": ["GENERAL_AGENT"],
+    "expected_type": "general"
+  }
+]

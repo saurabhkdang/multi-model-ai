@@ -3,3 +3,4 @@ agetnts/__pycache__/
 tools/__pycache__/
 .env
 logs/app.log
+*.zip

@@ -1,3 +1,8 @@
 {
-  "employee_name": "Saurabh Dang"
+  "employee_name": "Saurabh Dang",
+  "last_employee": "Saurabh Dang",
+  "last_query": "Explain the policy related to attendance for Saurabh Dang",
+  "last_topic": "attendance",
+  "last_subject": "attendance policy",
+  "current_focus": "attendance policy"
 }
